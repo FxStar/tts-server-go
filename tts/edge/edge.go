@@ -3,7 +3,6 @@ package edge
 import (
 	"context"
 	"encoding/binary"
-	"encoding/hex"
 	"fmt"
 	"math/rand"
 	"net"
@@ -121,7 +120,7 @@ func (t *TTS) GetAudio(ssml, format string) (audioData []byte, err error) {
 	var failed = make(chan error)
 	glog.SetPath("./log")
 	t.onReadMessage = func(messageType int, p []byte, errMessage error) bool {
-		glog.Info(context.Background(), "src:", hex.EncodeToString(p))
+		// glog.Info(context.Background(), "src:", hex.EncodeToString(p))
 		if messageType == -1 && p == nil && errMessage != nil { //已经断开链接
 			if running {
 				failed <- errMessage
@@ -133,8 +132,8 @@ func (t *TTS) GetAudio(ssml, format string) (audioData []byte, err error) {
 			// index := strings.Index(string(p), "Path:audio")
 			lengthbyte := p[:2]
 			length := int(binary.BigEndian.Uint16(lengthbyte))
-			he := p[2:length]
-			glog.Info(context.Background(), "he:", hex.EncodeToString(he))
+			// he := p[2:length]
+			// glog.Info(context.Background(), "he:", hex.EncodeToString(he))
 			if len(p) > length+2+2 {
 				data := p[length+2:]
 				// data := []byte(string(p)[index+12:])
@@ -143,11 +142,11 @@ func (t *TTS) GetAudio(ssml, format string) (audioData []byte, err error) {
 			}
 
 		} else if messageType == websocket.TextMessage && string(p)[len(string(p))-14:len(string(p))-6] == "turn.end" {
-			glog.Info(context.Background(), "TextMessage:", string(p))
+			// glog.Info(context.Background(), "TextMessage:", string(p))
 			finished <- true
 			return false
 		} else if messageType == websocket.TextMessage {
-			glog.Info(context.Background(), "TextMessage:", string(p))
+			// glog.Info(context.Background(), "TextMessage:", string(p))
 			fmt.Println(string(p))
 		}
 		return false
